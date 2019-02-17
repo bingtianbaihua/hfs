@@ -1,10 +1,13 @@
-package service
+package middleware
 
 import (
 	"fmt"
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/bingtianbaihua/hfs/log"
+	"github.com/bingtianbaihua/hfs/model"
 )
 
 type Server interface {
@@ -37,12 +40,23 @@ func NewHTTPServer(cfg *Config) (Server, error) {
 		return nil, fmt.Errorf("config can not be empty")
 	}
 
-	handler := http.StripPrefix(cfg.Prefix, http.FileServer(http.Dir(cfg.Dir)))
+	fileAdapter, err := NewFileAdapter(&FileAdapterConfig{Prefix: cfg.Prefix, Dir: cfg.Dir})
+	logAdapter, err := NewLogHandler(new(LogConfig))
+	recoverAdapter := NewRecoverAdapter()
+	if err != nil {
+		log.Info("error:%v", err)
+		return nil, err
+	}
+
+	// build handler chains
+	chains := model.Build(fileAdapter.fileHandle(), logAdapter.HandleTask, recoverAdapter.HandleTask)
+
 	server := &http.Server{
 		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
-		Handler:      handler,
+		Handler:      chains,
 		ReadTimeout:  time.Duration(10) * time.Second,
 		WriteTimeout: time.Duration(10) * time.Second,
+		IdleTimeout:  time.Duration(10) * time.Second,
 	}
 	return &HTTPServer{
 		Server: server,
