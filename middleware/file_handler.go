@@ -23,6 +23,6 @@ func NewFileAdapter(cfg *FileAdapterConfig) (*FileAdapter, error) {
 	}, nil
 }
 
-func (s *FileAdapter) fileHandle() http.Handler {
+func (s *FileAdapter) FileHandle() http.Handler {
 	return http.StripPrefix(s.Prefix, http.FileServer(http.Dir(s.Dir)))
 }

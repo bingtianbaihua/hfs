@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bingtianbaihua/hfs/middleware"
+	"github.com/bingtianbaihua/hfs/server"
 )
 
 const (
@@ -38,14 +38,14 @@ func main() {
 	flag.Parse()
 	fmt.Println(host, port, prefix, dir)
 
-	cfg := &middleware.Config{
+	cfg := &server.Config{
 		Host:   host,
 		Port:   port,
 		Prefix: prefix,
 		Dir:    dir,
 	}
 
-	srv, err := middleware.NewHTTPServer(cfg)
+	srv, err := server.NewHTTPServer(cfg)
 	if err != nil {
 		log.Fatalf("new server error:%v", err)
 		return
