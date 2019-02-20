@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"time"
 
 	"github.com/bingtianbaihua/hfs/log"
 	"github.com/bingtianbaihua/hfs/middleware"
@@ -53,12 +52,10 @@ func NewHTTPServer(cfg *Config) (Server, error) {
 	chains := model.Build(fileAdapter.FileHandle(), logAdapter.HandleTask, recoverAdapter.HandleTask)
 
 	server := &http.Server{
-		Addr:         net.JoinHostPort(cfg.Host, cfg.Port),
-		Handler:      chains,
-		ReadTimeout:  time.Duration(10) * time.Second,
-		WriteTimeout: time.Duration(10) * time.Second,
-		IdleTimeout:  time.Duration(10) * time.Second,
+		Addr:    net.JoinHostPort(cfg.Host, cfg.Port),
+		Handler: chains,
 	}
+
 	return &HTTPServer{
 		Server: server,
 	}, nil
