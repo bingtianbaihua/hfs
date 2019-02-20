@@ -1,11 +1,11 @@
-all:
+all: fmt build
 	GOBIN="`pwd`/bin" go install -v ./cmd/...
 
-install: all
-	@echo
+build:
+	go build -o ./bin/hfs ./cmd
 
 clean:
 	rm -rf bin
 
-gofmt:
-	find . -name '*.go' | xargs -l1 go fmt
+fmt:
+	go fmt ./...
