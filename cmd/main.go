@@ -13,7 +13,8 @@ const (
 )
 
 var (
-	host, port, prefix, dir, v string
+	host, port, prefix, dir, v, cert, key string
+	tls                                   bool
 )
 
 func main() {
@@ -22,6 +23,9 @@ func main() {
 	flag.StringVar(&port, "port", "8910", "listen http port")
 	flag.StringVar(&prefix, "prefix", "/", "http route path")
 	flag.StringVar(&dir, "dir", "./", "http file directory")
+	flag.StringVar(&cert, "cert", "", "https cert file")
+	flag.StringVar(&key, "key", "", "https key file")
+	flag.BoolVar(&tls, "tls", false, "enable https")
 
 	flag.Parse()
 	fmt.Printf("address: %v, port: %v, url prefix: %v, serve directory: %v\n", host, port, prefix, dir)
@@ -39,5 +43,9 @@ func main() {
 		return
 	}
 
-	srv.ListenAndServe()
+	if tls && cert != "" && key != "" {
+		srv.ListenAndServeTLS(cert, key)
+	} else {
+		srv.ListenAndServe()
+	}
 }
