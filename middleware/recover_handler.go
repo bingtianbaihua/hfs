@@ -13,6 +13,7 @@ func (rv *RecoverAdapter) HandleTask(w http.ResponseWriter, r *http.Request, stk
 	log.Info("start catch panic...")
 	defer func() {
 		if err := recover(); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			log.Warn("panic with error: %v\n", err)
 		}
 	}()
