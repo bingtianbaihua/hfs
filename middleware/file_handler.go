@@ -24,5 +24,5 @@ func NewFileAdapter(cfg *FileAdapterConfig) (*FileAdapter, error) {
 }
 
 func (s *FileAdapter) FileHandle() http.Handler {
-	return http.StripPrefix(s.Prefix, http.FileServer(http.Dir(s.Dir)))
+	return CompressHandler(http.StripPrefix(s.Prefix, http.FileServer(http.Dir(s.Dir))))
 }
