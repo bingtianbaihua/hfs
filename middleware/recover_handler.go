@@ -10,7 +10,6 @@ type RecoverAdapter struct{}
 
 // NewRecovery creates a new instance of Recovery
 func (rv *RecoverAdapter) HandleTask(w http.ResponseWriter, r *http.Request, stk func(http.ResponseWriter, *http.Request)) {
-	log.Info("start catch panic...")
 	defer func() {
 		if err := recover(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

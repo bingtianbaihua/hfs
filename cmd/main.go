@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"log"
+	"net"
+	"strconv"
+
+	"github.com/bingtianbaihua/hfs/log"
 
 	"github.com/bingtianbaihua/hfs/server"
 )
@@ -13,8 +15,7 @@ const (
 )
 
 var (
-	host, port, prefix, dir, v, cert, key string
-	tls                                   bool
+	host, port, prefix, dir, v, cert, key, tls string
 )
 
 func main() {
@@ -25,10 +26,9 @@ func main() {
 	flag.StringVar(&dir, "dir", "./", "http file directory")
 	flag.StringVar(&cert, "cert", "", "https cert file")
 	flag.StringVar(&key, "key", "", "https key file")
-	flag.BoolVar(&tls, "tls", false, "enable https")
+	flag.StringVar(&tls, "tls", "false", "enable https")
 
 	flag.Parse()
-	fmt.Printf("address: %v, port: %v, url prefix: %v, serve directory: %v\n", host, port, prefix, dir)
 
 	cfg := &server.Config{
 		Host:   host,
@@ -39,13 +39,20 @@ func main() {
 
 	srv, err := server.NewHTTPServer(cfg)
 	if err != nil {
-		log.Fatalf("new server error:%v", err)
+		log.Error("new server error:%v", err)
 		return
 	}
 
-	if tls && cert != "" && key != "" {
-		srv.ListenAndServeTLS(cert, key)
+	b, err := strconv.ParseBool(tls)
+	if err != nil {
+		b = false
+	}
+
+	if b && cert != "" && key != "" {
+		log.Info("Starting HTTPS server on: %v", net.JoinHostPort(cfg.Host, cfg.Port))
+		log.Warn("HTTPS server error: %v", srv.ListenAndServeTLS(cert, key))
 	} else {
-		srv.ListenAndServe()
+		log.Info("Starting HTTP server on: %v", net.JoinHostPort(cfg.Host, cfg.Port))
+		log.Warn("http server error: %v", srv.ListenAndServe())
 	}
 }
