@@ -10,7 +10,10 @@ var (
 
 func init() {
 	Log = logs.NewLogger()
+
 	Log.SetLogger(logs.AdapterConsole)
+	Log.EnableFuncCallDepth(true)
+	Log.SetLogFuncCallDepth(3)
 }
 
 func Info(format string, v ...interface{}) {
